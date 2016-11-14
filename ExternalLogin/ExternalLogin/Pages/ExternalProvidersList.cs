@@ -26,6 +26,8 @@ namespace ExternalLogin.Pages
         {
             try
             {
+                NavigationPage.SetHasNavigationBar(this, false);
+
                 Device.BeginInvokeOnMainThread(async () =>
                 {
                     using (UserDialogs.Instance.Loading("Loading..."))
@@ -75,7 +77,7 @@ namespace ExternalLogin.Pages
                     {
                         _selectedProvider = externalLoginProviders[localIndex];
                         //Navigate to browser page
-                        Navigation.PushModalAsync(App.BrowserLoginViewPage(_selectedProvider));
+                        Navigation.PushAsync(App.BrowserLoginViewPage(_selectedProvider));
                     };
 
                     var cvBtnLogin = new ContentView

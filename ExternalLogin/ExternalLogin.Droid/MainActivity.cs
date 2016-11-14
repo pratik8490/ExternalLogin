@@ -28,6 +28,7 @@ namespace ExternalLogin.Droid
                 this.SetIoc();
             }
 
+            this.ActionBar.SetIcon(Android.Resource.Color.Transparent);
             LoadApplication(new App());
         }
 

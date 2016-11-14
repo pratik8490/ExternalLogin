@@ -9,9 +9,13 @@ namespace ExternalLogin.Helper
 {
     public class Constants
     {
-        public const string ServiceURL = "http://externalproviderdemo.azurewebsites.net/";
+        public const string ServiceURL = "https://api.flavortownusa.com";
         public const string FacebookIcon = "icon_facebook.png";
+        public const string LeftMenuIcon = "line_menu.png";
+        public const string SlideOut = "slideout.png";
         public const string FbColor = "#3d509f";
+        public static Color BarBackGroundColor = Color.FromHex("#428BCA");
+        public static Color BarBackTextColor = Color.White;
     }
 
     #region Layout Helper

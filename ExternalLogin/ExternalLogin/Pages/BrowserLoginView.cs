@@ -1,6 +1,7 @@
 ﻿using Acr.UserDialogs;
 using ExternalLogin.Helper;
 using ExternalLogin.Models;
+using ModernHttpClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,33 +51,35 @@ namespace ExternalLogin.Pages
                 StackLayout slLayout = new StackLayout { VerticalOptions = LayoutOptions.FillAndExpand, HorizontalOptions = LayoutOptions.FillAndExpand, BackgroundColor = LayoutHelper.PageBackgroundColor };
                 slLayout.Padding = LayoutHelper.IOSPadding(0, 20, 0, 0);
 
-                string url = String.Format("{0}/{1}", Services.BaseUri, _selectedProvider.Url);
+                string url = String.Format("{0}{1}", Services.BaseUri, _selectedProvider.Url);
 
-                var hwv = new HybridWebView { VerticalOptions = LayoutOptions.FillAndExpand, HorizontalOptions = LayoutOptions.FillAndExpand };
+                var hwv = new ExtendedWebView { VerticalOptions = LayoutOptions.FillAndExpand, HorizontalOptions = LayoutOptions.FillAndExpand };
+
+                //var hwv = new HybridWebView { VerticalOptions = LayoutOptions.FillAndExpand, HorizontalOptions = LayoutOptions.FillAndExpand };
 
                 slLayout.Children.Add(hwv);
 
-                hwv.Uri = new Uri(url);
+                hwv.Source = new Uri(url);
 
-                hwv.RegisterCallback("dataCallback", t =>
-                   Device.BeginInvokeOnMainThread(() =>
-                   {
-                       /**********************************/
-                       //THIS WILL WORK FOR PAGE 1 ONLY
-                       /*********************************/
-                       System.Diagnostics.Debug.WriteLine("!!!!!!!!!!!!!!!!! dataCallback: " + t);
-                   })
-                );
+                //hwv.RegisterCallback("dataCallback", t =>
+                //   Device.BeginInvokeOnMainThread(() =>
+                //   {
+                //       /**********************************/
+                //       //THIS WILL WORK FOR PAGE 1 ONLY
+                //       /*********************************/
+                //       System.Diagnostics.Debug.WriteLine("!!!!!!!!!!!!!!!!! dataCallback: " + t);
+                //   })
+                //);
 
-                hwv.LoadFinished += (s, e) =>
-                {
-                    /***********************************/
-                    //THIS WILL WORK FOR PAGE 1 ONLY
-                    //WEAK REFERENCE LOST???
-                    /***********************************/
-                    ParseUrlForAccessToken(url);
-                    System.Diagnostics.Debug.WriteLine("(!!!!!!!!!!!!!!!!!!!! LoadFinished");
-                };
+                //hwv.LoadFinished += (s, e) =>
+                //{
+                //    /***********************************/
+                //    //THIS WILL WORK FOR PAGE 1 ONLY
+                //    //WEAK REFERENCE LOST???
+                //    /***********************************/
+                //    ParseUrlForAccessToken(hwv.Uri.ToString());
+                //    System.Diagnostics.Debug.WriteLine("(!!!!!!!!!!!!!!!!!!!! LoadFinished");
+                //};
 
                 ScrollView scrollContent = new ScrollView
                 {
@@ -97,7 +100,6 @@ namespace ExternalLogin.Pages
             int accessTokenIndex = url.IndexOf(fieldName, StringComparison.Ordinal);
             if (accessTokenIndex > -1)
             {
-
                 int ampersandTokenIndex = url.IndexOf("&", accessTokenIndex, StringComparison.Ordinal);
                 string tokenField = url.Substring(accessTokenIndex, ampersandTokenIndex - accessTokenIndex);
                 string token = tokenField.Substring(fieldName.Length);
@@ -113,7 +115,7 @@ namespace ExternalLogin.Pages
 
             try
             {
-                using (HttpClient client = new HttpClient { BaseAddress = new Uri(Services.BaseUri) })
+                using (HttpClient client = new HttpClient(new NativeMessageHandler()) { BaseAddress = new Uri(Services.BaseUri) })
                 {
                     client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(String.Format("Bearer {0}", Services.AccessToken));
                     HttpResponseMessage response = await client.GetAsync(uri);

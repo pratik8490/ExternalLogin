@@ -1,4 +1,5 @@
 ﻿using ExternalLogin.Models;
+using ModernHttpClient;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -27,7 +28,7 @@ namespace ExternalLogin.Services
         {
             List<ExternalLoginViewModel> models = new List<ExternalLoginViewModel>();
 
-            using (HttpClient client = new HttpClient { BaseAddress = new Uri(_baseUri) })
+            using (HttpClient client = new HttpClient(new NativeMessageHandler()) { BaseAddress = new Uri(_baseUri) })
             {
                 try
                 {
@@ -66,7 +67,7 @@ namespace ExternalLogin.Services
 
             try
             {
-                using (HttpClient client = new HttpClient { BaseAddress = new Uri(_baseUri) })
+                using (HttpClient client = new HttpClient(new NativeMessageHandler()) { BaseAddress = new Uri(_baseUri) })
                 {
                     client.DefaultRequestHeaders.Accept.Clear();
                     client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
@@ -89,5 +90,36 @@ namespace ExternalLogin.Services
                 throw new InvalidOperationException("Unable to register user", ex);
             }
         }
+
+        public async Task<UserInfoViewModel> GetUserInfo()
+        {
+            UserInfoViewModel model = new UserInfoViewModel();
+            try
+            {
+                using (HttpClient client = new HttpClient(new NativeMessageHandler()) { BaseAddress = new Uri(BaseUri) })
+                {
+
+                    string requestUri = String.Format("/api/Account/UserInfo");
+
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                    client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Authorization", "Bearer " + AccessToken);
+                    HttpResponseMessage response = await client.GetAsync(requestUri);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string result = await response.Content.ReadAsStringAsync();
+                        model = JsonConvert.DeserializeObject<UserInfoViewModel>(result);
+                    }
+
+                    return model;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException("Unable to get login info.", ex);
+            }
+        }
+
     }
 }

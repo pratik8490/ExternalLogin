@@ -1,4 +1,5 @@
-﻿using ExternalLogin.Helper;
+﻿using ExternalLogin.Context;
+using ExternalLogin.Helper;
 using ExternalLogin.Services;
 using System;
 using System.Collections.Generic;
@@ -20,6 +21,54 @@ namespace ExternalLogin.Pages
         public AuthenticationServices Services
         {
             get { return _Services; }
+        }
+
+
+        #region Override Method
+        /// <summary>
+        /// On appearing method.
+        /// </summary>
+        protected override void OnAppearing()
+        {
+            BindToolbar();
+        }
+        protected override void OnDisappearing()
+        {
+            this.ToolbarItems.Clear();
+        }
+        #endregion
+
+        public void BindToolbar()
+        {
+
+            List<ToolbarItem> lstToolbarItem = new List<ToolbarItem>();
+
+            //ExtendedToolbarItem menuToolbarItem = new ExtendedToolbarItem("Menu", Constants.LeftMenuIcon, ToolbarItemOrder.Primary, CategoryMenu);
+
+            lstToolbarItem.Add(new ToolbarItem
+            {
+                Text = "LogOut",
+                Order = ToolbarItemOrder.Secondary,
+                Command = new Command(Logout)
+            });
+
+            foreach (ToolbarItem item in lstToolbarItem)
+            {
+                this.ToolbarItems.Add(item);
+            }
+        }
+        private async void Logout()
+        {
+            ExternalLoginContext.Clear();
+            Navigation.PushModalAsync(App.GettingStartPage());
+        }
+        public void CategoryMenu()
+        {
+            string ViewName = (ParentView.ParentView).GetType().Name;
+            if ((ParentView.ParentView).GetType().Name != "NavigationPage")
+                ((MasterDetailPage)(ParentView).ParentView).IsPresented = !((MasterDetailPage)(ParentView).ParentView).IsPresented;
+            else
+                ((MasterDetailPage)ParentView).IsPresented = !((MasterDetailPage)ParentView).IsPresented;
         }
     }
 }
