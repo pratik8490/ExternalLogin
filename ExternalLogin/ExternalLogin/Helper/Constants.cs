@@ -16,6 +16,12 @@ namespace ExternalLogin.Helper
         public const string FbColor = "#3d509f";
         public static Color BarBackGroundColor = Color.FromHex("#428BCA");
         public static Color BarBackTextColor = Color.White;
+
+        public class RegxValidation
+        {
+            public const string EmailValidationPattern = @"\A(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\Z";
+            public const string PhoneNumberRegx = @"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$";
+        }
     }
 
     #region Layout Helper

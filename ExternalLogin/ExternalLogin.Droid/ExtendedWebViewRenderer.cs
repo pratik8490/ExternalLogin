@@ -31,6 +31,7 @@ namespace ExternalLogin.Droid
 
                     ParseUrlForAccessToken(url);
                 }
+
                 base.OnPageFinished(view, url);
             }
         }
@@ -62,7 +63,7 @@ namespace ExternalLogin.Droid
 
                 //await _Services.GetUserInfo();
 
-                App.TestPage();
+
             }
         }
     }

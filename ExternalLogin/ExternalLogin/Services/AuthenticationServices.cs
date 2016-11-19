@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Security;
 using System.Text;
@@ -53,13 +54,14 @@ namespace ExternalLogin.Services
             }
         }
 
-        public async Task RegisterExternal(string username)
+        public async Task RegisterExternal(string username, string email)
         {
             string uri = String.Format("{0}/api/Account/RegisterExternal", BaseUri);
 
             RegisterExternalBindingModel model = new RegisterExternalBindingModel
             {
-                UserName = username
+                UserName = username,
+                Email = email
             };
 
             string postJson = JsonConvert.SerializeObject(model);
@@ -67,7 +69,7 @@ namespace ExternalLogin.Services
 
             try
             {
-                using (HttpClient client = new HttpClient(new NativeMessageHandler()) { BaseAddress = new Uri(_baseUri) })
+                using (HttpClient client = new HttpClient { BaseAddress = new Uri(_baseUri) })
                 {
                     client.DefaultRequestHeaders.Accept.Clear();
                     client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
@@ -96,14 +98,13 @@ namespace ExternalLogin.Services
             UserInfoViewModel model = new UserInfoViewModel();
             try
             {
-                using (HttpClient client = new HttpClient(new NativeMessageHandler()) { BaseAddress = new Uri(BaseUri) })
+                using (HttpClient client = new HttpClient { BaseAddress = new Uri(BaseUri) })
                 {
 
                     string requestUri = String.Format("/api/Account/UserInfo");
 
-                    client.DefaultRequestHeaders.Accept.Clear();
                     client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
-                    client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Authorization", "Bearer " + AccessToken);
+                    client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", AccessToken.ToString());
                     HttpResponseMessage response = await client.GetAsync(requestUri);
 
                     if (response.IsSuccessStatusCode)
@@ -115,11 +116,14 @@ namespace ExternalLogin.Services
                     return model;
                 }
             }
+            catch(WebException ex)
+            {
+                throw new InvalidOperationException("Unable to get login info.", ex);
+            }
             catch (Exception ex)
             {
                 throw new InvalidOperationException("Unable to get login info.", ex);
             }
         }
-
     }
 }

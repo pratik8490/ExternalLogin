@@ -51,7 +51,7 @@ namespace ExternalLogin
 
         public static Page TestPage()
         {
-            return new test();
+            return new Register();
         }
 
         protected override void OnStart()
